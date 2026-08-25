@@ -106,4 +106,3 @@ Based on our 5-Fold Cross-Validation:
 
 *A full list of the 9 academic research papers supporting this architecture can be found in the **References** tab of the application.*
 
-```
