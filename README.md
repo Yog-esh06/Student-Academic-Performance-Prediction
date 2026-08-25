@@ -1,7 +1,5 @@
-Here is the direct, copy-paste markdown content for your `README.md` file:
 
-```markdown
-# Student Academic Performance Prediction & XAI System
+# Student Academic Performance Prediction 
 
 An advanced, research-backed machine learning decision-support framework designed to forecast continuous student examination scores, detect performance risk tiers, and decode model predictions using SHAP (SHapley Additive exPlanations). 
 
