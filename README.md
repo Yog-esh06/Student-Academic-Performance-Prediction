@@ -1,3 +1,6 @@
+Here is the direct, copy-paste markdown content for your `README.md` file:
+
+```markdown
 # Student Academic Performance Prediction & XAI System
 
 An advanced, research-backed machine learning decision-support framework designed to forecast continuous student examination scores, detect performance risk tiers, and decode model predictions using SHAP (SHapley Additive exPlanations). 
@@ -52,36 +55,59 @@ Student-Academic-Performance-Prediction/
 ├── models_store/                 # Serialized .pkl models and preprocessors
 ├── main.py                       # End-to-end pipeline orchestrator
 └── README.md                     # Project documentation
-🚀 Setup & Installation
-Clone the Repository:
 
-Bash
+```
+
+---
+
+## 🚀 Setup & Installation
+
+1. **Clone the Repository:**
+```bash
 git clone [https://github.com/Yog-esh06/Student-Academic-Performance-Prediction.git](https://github.com/Yog-esh06/Student-Academic-Performance-Prediction.git)
 cd Student-Academic-Performance-Prediction
-Install Dependencies:
+
+```
+
+
+2. **Install Dependencies:**
 Ensure you have Python installed, then run:
-
-Bash
+```bash
 pip install -r requirements.txt
-Generate EDA & Train Models (Optional/First Run):
-To build the models and generate the inferences.json and EDA graphs from scratch:
 
-Bash
+```
+
+
+3. **Generate EDA & Train Models (Optional/First Run):**
+To build the models and generate the `inferences.json` and EDA graphs from scratch:
+```bash
 python main.py
-Launch the Dashboard:
+
+```
+
+
+4. **Launch the Dashboard:**
 Start the Flask web server:
-
-Bash
+```bash
 python -m src.app.app
-Open your browser and navigate to http://127.0.0.1:5000.
 
-📊 Model Evaluation Overview
+```
+
+
+Open your browser and navigate to `http://127.0.0.1:5000`.
+
+---
+
+## 📊 Model Evaluation Overview
+
 Based on our 5-Fold Cross-Validation:
 
-Linear Regression (Winner): Cleanly maps the direct linear relationships (like study hours to scores), yielding the lowest RMSE (1.80) and highest R² (77.0%).
+* **Linear Regression (Winner):** Cleanly maps the direct linear relationships (like study hours to scores), yielding the lowest RMSE (1.80) and highest $R^2$ (77.0%).
+* **Gradient Boosting & XGBoost:** Strong ensemble performers but slightly underfit due to the continuous linear nature of this specific dataset.
+* **Decision Trees:** Suffer from high variance (RMSE 3.53) as they heavily overfit the training data by creating hyper-specific branches.
 
-Gradient Boosting & XGBoost: Strong ensemble performers but slightly underfit due to the continuous linear nature of this specific dataset.
+*A full list of the 9 academic research papers supporting this architecture can be found in the **References** tab of the application.*
 
-Decision Trees: Suffer from high variance (RMSE 3.53) as they heavily overfit the training data by creating hyper-specific branches.
+```
 
-A full list of the 9 academic research papers supporting this architecture can be found in the References tab of the application.
+```
