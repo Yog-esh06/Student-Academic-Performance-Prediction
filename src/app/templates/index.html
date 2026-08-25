@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en" class="dark" id="htmlRoot">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Academic Performance Prediction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#020617',
+                        cardbg: '#0f172a',
+                        lightbg: '#f1f5f9',
+                        lightcard: '#ffffff',
+                        accent: '#38bdf8'
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .tooltip-container { position: relative; }
+        .tooltip-card {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            position: absolute;
+            bottom: 105%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 320px;
+            z-index: 50;
+        }
+        .tooltip-container:hover .tooltip-card {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Floating and Spinning Border Animation with dynamic colors */
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .hover-float-spin {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+            padding: 2px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: transparent;
+            height: 100%;
+        }
+        .hover-float-spin:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px -5px var(--spin-color, #38bdf8);
+        }
+        .hover-float-spin::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150%;
+            height: 150%;
+            background: conic-gradient(from 0deg, transparent 70%, var(--spin-color, #38bdf8) 100%);
+            transform-origin: center;
+            animation: spin 2s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 0;
+        }
+        .hover-float-spin:hover::before {
+            opacity: 1;
+        }
+        .hover-float-spin-inner {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            border-radius: calc(1rem - 2px);
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body class="bg-lightbg text-slate-900 dark:bg-darkbg dark:text-slate-100 font-sans antialiased min-h-screen flex transition-colors duration-300">
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-72 bg-white dark:bg-cardbg border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between p-6 fixed h-full z-10 shadow-lg">
+        <div>
+            <div class="text-xl font-black bg-gradient-to-r from-sky-400 to-indigo-500 bg-clip-text text-transparent mb-8 tracking-wider">
+                STUDENT ACADEMIC PERFORMANCE
+            </div>
+            <nav class="space-y-3">
+                <button onclick="switchTab('home')" class="nav-btn w-full text-left px-4 py-3 rounded-xl font-semibold text-base transition-all text-slate-600 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:bg-sky-500/10 active-tab">Home</button>
+                <button onclick="switchTab('predict')" class="nav-btn w-full text-left px-4 py-3 rounded-xl font-semibold text-base transition-all text-slate-600 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:bg-sky-500/10">Analyze Scores</button>
+                <button onclick="switchTab('dataset')" class="nav-btn w-full text-left px-4 py-3 rounded-xl font-semibold text-base transition-all text-slate-600 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:bg-sky-500/10">Dataset Description</button>
+                <button onclick="switchTab('models')" class="nav-btn w-full text-left px-4 py-3 rounded-xl font-semibold text-base transition-all text-slate-600 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:bg-sky-500/10">Model Analysis</button>
+                <button onclick="switchTab('references')" class="nav-btn w-full text-left px-4 py-3 rounded-xl font-semibold text-base transition-all text-slate-600 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 hover:bg-sky-500/10">References</button>
+            </nav>
+        </div>
+        <div class="text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 pt-4">
+            Machine Learning - 21CSC305P <br>Continuous Score Prediction
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="ml-72 flex-1 p-12 overflow-y-auto">
+        
+        <div class="flex justify-end mb-6">
+            <button onclick="toggleTheme()" class="px-4 py-2 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-xl text-sm font-bold shadow transition border border-slate-300 dark:border-slate-700">
+                Light/Dark Mode 🌓
+            </button>
+        </div>
+
+        <!-- 1. HOME TAB -->
+        <section id="home" class="tab-content">
+            <div class="max-w-4xl mx-auto py-6">
+                <span class="px-3 py-1 text-xs font-bold bg-sky-500/10 text-sky-500 dark:text-sky-400 rounded-full border border-sky-500/20">Institutional Research Project</span>
+                <h1 class="text-5xl font-extrabold mt-4 mb-6 tracking-tight text-slate-900 dark:text-white">Student Academic Performance Prediction</h1>
+                <p class="text-xl text-slate-600 dark:text-slate-300 mb-10 leading-relaxed">
+                    A multi-factor predictive framework utilizing regression models and SHAP to forecast continuous examination scores, detect student risk tiers, and generate actionable insights.
+                </p>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="hover-float-spin" style="--spin-color: #38bdf8;">
+                        <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-8">
+                            <h3 class="text-xs uppercase tracking-wider text-sky-500 dark:text-sky-400 font-bold mb-1">Subject Name & Code</h3>
+                            <p class="text-lg font-bold text-slate-900 dark:text-white">Machine Learning - 21CSC305P</p>
+                        </div>
+                    </div>
+                    
+                    <div class="hover-float-spin" style="--spin-color: #c084fc;">
+                        <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-8">
+                            <h3 class="text-xs uppercase tracking-wider text-purple-500 dark:text-purple-400 font-bold mb-1">Mentored by</h3>
+                            <p class="text-lg font-bold text-slate-900 dark:text-white">
+                                <a href="https://www.srmist.edu.in/faculty/dr-angayarkanni-v/" target="_blank" class="text-slate-900 dark:text-white hover:text-purple-500 dark:hover:text-purple-400 hover:underline transition-colors">Dr. V. Angayarkanni</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="hover-float-spin col-span-2" style="--spin-color: #10b981;">
+                        <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-8">
+                            <h3 class="text-xs uppercase tracking-wider text-emerald-500 dark:text-emerald-400 font-bold mb-4">Project Team Members</h3>
+                            <ul class="grid grid-cols-2 gap-4 text-base font-bold text-slate-900 dark:text-white">
+                                <li class="flex flex-col"><a href="https://www.linkedin.com/in/yog-esh06/" target="_blank" class="text-slate-900 dark:text-white hover:text-emerald-500 dark:hover:text-emerald-400 hover:underline transition-colors">Yogesh R Mehta</a> <span class="text-xs font-normal text-slate-500 dark:text-slate-400">RA2411003010776</span></li>
+                                <li class="flex flex-col"><a href="https://www.linkedin.com/in/bhavym/" target="_blank" class="text-slate-900 dark:text-white hover:text-emerald-500 dark:hover:text-emerald-400 hover:underline transition-colors">Bhavy Manchanda</a> <span class="text-xs font-normal text-slate-500 dark:text-slate-400">RA2411003010749</span></li>
+                                <li class="flex flex-col"><a href="https://www.linkedin.com/in/darsh-saraf-540b19323/" target="_blank" class="text-slate-900 dark:text-white hover:text-emerald-500 dark:hover:text-emerald-400 hover:underline transition-colors">Darsh M Saraf</a> <span class="text-xs font-normal text-slate-500 dark:text-slate-400">RA2411003010731</span></li>
+                                <li class="flex flex-col">Bhavish <span class="text-xs font-normal text-slate-500 dark:text-slate-400">RA2411003010765</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. ANALYZE SCORES TAB -->
+        <section id="predict" class="tab-content hidden">
+            <h2 class="text-4xl font-extrabold mb-3 text-slate-900 dark:text-white">Predictive Inference</h2>
+            <p class="text-lg text-slate-600 dark:text-slate-300 mb-6">Simulate student profiles or use quick auto-fill presets to calculate expected exam outcomes with transparent feature attributions.</p>
+
+            <div class="bg-sky-500/10 border border-sky-500/30 p-4 rounded-xl mb-6 text-sm text-sky-700 dark:text-sky-300">
+                <strong class="font-bold">How to use this analyzer:</strong> 
+                1. Click one of the <strong>Auto-Fill Presets</strong> below to instantly load a sample student profile. 
+                2. Click <strong>Execute Prediction</strong> to calculate the score and decode the exact feature contributions.
+            </div>
+
+            <!-- 5 Autopilot Presets -->
+            <div class="flex flex-wrap gap-3 mb-8">
+                <button onclick="applyPreset('overachiever')" class="px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-sm font-bold rounded-xl hover:bg-emerald-500/20 transition">Auto: Overachiever</button>
+                <button onclick="applyPreset('average')" class="px-4 py-2 bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-sm font-bold rounded-xl hover:bg-amber-500/20 transition">Auto: Average Student</button>
+                <button onclick="applyPreset('atRisk')" class="px-4 py-2 bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-sm font-bold rounded-xl hover:bg-rose-500/20 transition">Auto: At-Risk Student</button>
+                <button onclick="applyPreset('athlete')" class="px-4 py-2 bg-purple-500/10 border border-purple-500/30 text-purple-600 dark:text-purple-400 text-sm font-bold rounded-xl hover:bg-purple-500/20 transition">Auto: Active Athlete</button>
+                <button onclick="applyPreset('nightOwl')" class="px-4 py-2 bg-indigo-500/10 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 text-sm font-bold rounded-xl hover:bg-indigo-500/20 transition">Auto: Night Owl</button>
+            </div>
+
+            <!-- Layout: Left (Form), Right (Output & Actionable Insights) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Left Box: Form -->
+                <div class="hover-float-spin" style="--spin-color: #f59e0b;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-8">
+                        <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-800 pb-2 mb-6">Input Student Profile</h3>
+                        <form id="predictionForm" class="space-y-5">
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm uppercase tracking-wider text-amber-500 dark:text-amber-400 font-bold mb-2">Hours Studied</label>
+                                    <input type="number" id="Hours_Studied" class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-base text-slate-900 dark:text-slate-100 focus:outline-none focus:border-amber-400" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm uppercase tracking-wider text-amber-500 dark:text-amber-400 font-bold mb-2">Attendance (%)</label>
+                                    <input type="number" id="Attendance" class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-base text-slate-900 dark:text-slate-100 focus:outline-none focus:border-amber-400" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm uppercase tracking-wider text-amber-500 dark:text-amber-400 font-bold mb-2">Previous Scores</label>
+                                    <input type="number" id="Previous_Scores" class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-base text-slate-900 dark:text-slate-100 focus:outline-none focus:border-amber-400" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm uppercase tracking-wider text-amber-500 dark:text-amber-400 font-bold mb-2">Sleep Hours</label>
+                                    <input type="number" id="Sleep_Hours" class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-base text-slate-900 dark:text-slate-100 focus:outline-none focus:border-amber-400" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm uppercase tracking-wider text-amber-500 dark:text-amber-400 font-bold mb-2">Tutoring Sessions</label>
+                                    <input type="number" id="Tutoring_Sessions" class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-base text-slate-900 dark:text-slate-100 focus:outline-none focus:border-amber-400" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm uppercase tracking-wider text-amber-500 dark:text-amber-400 font-bold mb-2">Physical Activity</label>
+                                    <input type="number" id="Physical_Activity" class="w-full bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-base text-slate-900 dark:text-slate-100 focus:outline-none focus:border-amber-400" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full mt-6 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-lg py-4 rounded-xl transition shadow-lg shadow-amber-500/20">EXECUTE PREDICTION</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Right Box: Output & Actionable Insights -->
+                <div class="hover-float-spin" style="--spin-color: #38bdf8;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-8 flex flex-col">
+                        <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-800 pb-2 mb-6">Result & Actionable Insights</h3>
+                        
+                        <div class="flex items-baseline gap-4 mb-4">
+                            <span id="resScore" class="text-7xl font-black text-sky-500 dark:text-sky-400">--</span>
+                            <span class="text-base font-semibold text-slate-500 dark:text-slate-400">Predicted Exam Score</span>
+                        </div>
+                        <div id="resRisk" class="inline-block px-4 py-1.5 rounded-full text-sm font-bold mb-6 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Awaiting Profile Input</div>
+                        
+                        <h4 class="text-lg font-bold text-slate-800 dark:text-slate-200 mb-3">Actionable Insights</h4>
+                        <ul id="resRecs" class="space-y-3 text-base text-slate-700 dark:text-slate-300 list-none">
+                            <li class="text-slate-400 dark:text-slate-500 italic">Fill in the form to generate custom insights.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Box: SHAP Explanations -->
+            <div class="hover-float-spin" style="--spin-color: #10b981;">
+                <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-8">
+                    <h4 class="text-xl font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-800 pb-2 mb-6">Backed by SHAP Values (Feature Impact Justification)</h4>
+                    <div id="resShap" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-slate-600 dark:text-slate-300">
+                        <span class="text-slate-400 dark:text-slate-500 italic">Awaiting prediction to decode mathematical feature justifications...</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. DATASET DESCRIPTION TAB -->
+        <section id="dataset" class="tab-content hidden">
+            <h2 class="text-4xl font-extrabold mb-3 text-slate-900 dark:text-white">Exploratory Data Analysis (EDA)</h2>
+            <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">Comprehensive statistical distributions and multi-variable analytics derived from the 6,607 student record dataset.</p>
+            
+            <div id="inferenceContainer" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+        <!-- 4. MODEL ANALYSIS TAB -->
+        <section id="models" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h2 class="text-4xl font-extrabold mb-2 text-slate-900 dark:text-white">Comparative Model Evaluation</h2>
+                    <p class="text-lg text-slate-600 dark:text-slate-300">5-Fold Cross-Validation testing across regression architectures for Student Academic Performance Prediction.</p>
+                </div>
+                <a href="/api/download-stats" class="px-5 py-3 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-sky-600 dark:text-sky-400 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-bold transition shadow">Export Evaluation Report (.csv)</a>
+            </div>
+
+            <!-- 5 Big Accuracy Cards with Hover Tooltips -->
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-10">
+                
+                <div class="hover-float-spin tooltip-container" style="--spin-color: #38bdf8;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6 shadow-lg cursor-pointer">
+                        <span class="text-xs uppercase tracking-wider text-sky-500 dark:text-sky-400 font-bold">Linear Regression</span>
+                        <div class="text-3xl font-black text-sky-500 dark:text-sky-400 mt-2 mb-1">77.0%</div>
+                        <p class="text-[10px] font-medium text-slate-500 dark:text-slate-400">WINNER | $R^2$ Variance Acc</p>
+                        <div class="tooltip-card bg-slate-900 text-slate-200 p-4 rounded-xl shadow-2xl border border-slate-700 text-xs">
+                            <strong class="text-sky-400 block mb-1">Performance Details:</strong> Cleanly maps the direct linear relationship between study hours and exam scores without overfitting noise. Lowest overall error.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hover-float-spin tooltip-container" style="--spin-color: #818cf8;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6 shadow-lg cursor-pointer">
+                        <span class="text-xs uppercase tracking-wider text-indigo-500 dark:text-indigo-400 font-bold">Gradient Boosting</span>
+                        <div class="text-3xl font-black text-indigo-500 dark:text-indigo-400 mt-2 mb-1">73.5%</div>
+                        <p class="text-[10px] font-medium text-slate-500 dark:text-slate-400">$R^2$ Ensemble Fit Accuracy</p>
+                        <div class="tooltip-card bg-slate-900 text-slate-200 p-4 rounded-xl shadow-2xl border border-slate-700 text-xs">
+                            <strong class="text-indigo-400 block mb-1">Performance Details:</strong> Sequentially corrects errors of prior trees, but the underlying data lacks the high-dimensional non-linear complexities required to outpace simple linear mapping.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hover-float-spin tooltip-container" style="--spin-color: #c084fc;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6 shadow-lg cursor-pointer">
+                        <span class="text-xs uppercase tracking-wider text-purple-500 dark:text-purple-400 font-bold">XGBoost</span>
+                        <div class="text-3xl font-black text-purple-500 dark:text-purple-400 mt-2 mb-1">67.2%</div>
+                        <p class="text-[10px] font-medium text-slate-500 dark:text-slate-400">$R^2$ Boosted Accuracy</p>
+                        <div class="tooltip-card bg-slate-900 text-slate-200 p-4 rounded-xl shadow-2xl border border-slate-700 text-xs">
+                            <strong class="text-purple-400 block mb-1">Performance Details:</strong> The heavy regularization parameters cause slight underfitting on this continuous dataset, preventing it from tracking clean linear progressions.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hover-float-spin tooltip-container" style="--spin-color: #34d399;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6 shadow-lg cursor-pointer">
+                        <span class="text-xs uppercase tracking-wider text-emerald-500 dark:text-emerald-400 font-bold">Random Forest</span>
+                        <div class="text-3xl font-black text-emerald-500 dark:text-emerald-400 mt-2 mb-1">67.1%</div>
+                        <p class="text-[10px] font-medium text-slate-500 dark:text-slate-400">$R^2$ Bagging Accuracy</p>
+                        <div class="tooltip-card bg-slate-900 text-slate-200 p-4 rounded-xl shadow-2xl border border-slate-700 text-xs">
+                            <strong class="text-emerald-400 block mb-1">Performance Details:</strong> Averaging predictions across independent decision trees blunts the precision of extreme score forecasts, resulting in higher residual error.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hover-float-spin tooltip-container" style="--spin-color: #fb7185;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6 shadow-lg cursor-pointer">
+                        <span class="text-xs uppercase tracking-wider text-rose-500 dark:text-rose-400 font-bold">Decision Tree</span>
+                        <div class="text-3xl font-black text-rose-500 dark:text-rose-400 mt-2 mb-1">45.2%</div>
+                        <p class="text-[10px] font-medium text-slate-500 dark:text-slate-400">$R^2$ Accuracy | High Error</p>
+                        <div class="tooltip-card bg-slate-900 text-slate-200 p-4 rounded-xl shadow-2xl border border-slate-700 text-xs">
+                            <strong class="text-rose-400 block mb-1">Performance Details:</strong> Severely overfits the training data by creating hyper-specific branches, causing it to fail at generalizing continuous linear trends on new data.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alternating Explained Metrics Layout -->
+
+            <!-- 1. RMSE (Text Left, Graph Right) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="hover-float-spin" style="--spin-color: #38bdf8;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-8 justify-center">
+                        <h3 class="text-2xl font-bold text-sky-500 dark:text-sky-400 mb-4">1. Root Mean Squared Error (RMSE)</h3>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                            <strong>What it is & Why it's used:</strong> RMSE calculates the average distance between the model's predicted exam score and the actual score, heavily penalizing large outliers because the errors are squared. It is the gold standard for continuous prediction models.
+                        </p>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                            <strong>The Verdict:</strong> <span class="text-emerald-600 dark:text-emerald-400 font-bold">Linear Regression wins</span> by achieving the lowest RMSE (1.80). Because the dataset has strong linear trends (like study hours increasing scores), it maps the trajectory perfectly. <span class="text-rose-600 dark:text-rose-400 font-bold">Decision Trees perform worst</span> (RMSE 3.53) because they overfit the training data and fail to generalize on unseen test data.
+                        </p>
+                    </div>
+                </div>
+                <div class="hover-float-spin" style="--spin-color: #38bdf8;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
+                        <canvas id="chartRMSE"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. R-Squared (Graph Left, Text Right) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="hover-float-spin" style="--spin-color: #818cf8;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
+                        <canvas id="chartR2"></canvas>
+                    </div>
+                </div>
+                <div class="hover-float-spin" style="--spin-color: #818cf8;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-8 justify-center">
+                        <h3 class="text-2xl font-bold text-indigo-500 dark:text-indigo-400 mb-4">2. R-Squared (R²) Variance Score</h3>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                            <strong>What it is & Why it's used:</strong> R² measures the proportion of variance in the final exam score that can be explained by the student's input features. A higher percentage (closer to 1.0) means the model accurately captures the underlying trends.
+                        </p>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                            <strong>The Verdict:</strong> <span class="text-emerald-600 dark:text-emerald-400 font-bold">Linear Regression is best</span>, explaining 77.0% of the variance. Advanced ensemble models like <span class="text-amber-600 dark:text-amber-400 font-bold">XGBoost and Random Forest struggle slightly (67%)</span> because they partition data into step-based boundaries, making it harder for them to extrapolate smooth, continuous linear slopes.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. MAE (Text Left, Graph Right) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="hover-float-spin" style="--spin-color: #c084fc;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-8 justify-center">
+                        <h3 class="text-2xl font-bold text-purple-500 dark:text-purple-400 mb-4">3. Mean Absolute Error (MAE)</h3>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                            <strong>What it is & Why it's used:</strong> MAE provides the average absolute distance between predicted and actual scores. Unlike RMSE, it treats all errors equally without severely punishing outliers. It gives us a straightforward "points off" metric to understand basic accuracy.
+                        </p>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                            <strong>The Verdict:</strong> Consistent with previous metrics, <span class="text-emerald-600 dark:text-emerald-400 font-bold">Linear Regression provides the tightest absolute fit</span>. The predictions are consistently closer to the real exam scores point-for-point than any complex tree-based architecture.
+                        </p>
+                    </div>
+                </div>
+                <div class="hover-float-spin" style="--spin-color: #c084fc;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
+                        <canvas id="chartMAE"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. MSE (Graph Left, Text Right) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="hover-float-spin" style="--spin-color: #34d399;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
+                        <canvas id="chartMSE"></canvas>
+                    </div>
+                </div>
+                <div class="hover-float-spin" style="--spin-color: #34d399;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-8 justify-center">
+                        <h3 class="text-2xl font-bold text-emerald-500 dark:text-emerald-400 mb-4">4. Mean Squared Error (MSE)</h3>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                            <strong>What it is & Why it's used:</strong> MSE is the foundational calculation for RMSE. It represents the raw squared variance of prediction errors. While harder to interpret in direct "exam points", it is essential for algorithmic gradient descent to optimize model weights.
+                        </p>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                            <strong>The Verdict:</strong> The MSE chart decisively illustrates the mathematical gap between <span class="text-emerald-600 dark:text-emerald-400 font-bold">Linear mapping (lowest variance)</span> and <span class="text-rose-600 dark:text-rose-400 font-bold">Tree-based splitting algorithms</span>, which generate high variance on linear datasets.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Cross-Validation Explanation & Chart -->
+            <div class="grid grid-cols-1 gap-6 mt-8">
+                <div class="hover-float-spin" style="--spin-color: #f59e0b;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
+                        <h3 class="text-lg font-bold mb-4 text-amber-500 dark:text-amber-400">5. Overall Cross-Validation Score Comparison</h3>
+                        <canvas id="chartOverview" class="max-h-[350px]"></canvas>
+                    </div>
+                </div>
+                
+                <div class="hover-float-spin" style="--spin-color: #f59e0b;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-8">
+                        <h3 class="text-xl font-bold text-amber-500 dark:text-amber-400 mb-4">Understanding 5-Fold Cross-Validation</h3>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                            <strong>What it is:</strong> Instead of relying on a single test score, the dataset is divided into 5 equal chunks (folds). The model trains on 4 chunks and tests its predictions on the 1 remaining chunk. This entire process repeats 5 times so that every chunk acts as a test set exactly once.
+                        </p>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed m-0">
+                            <strong>Why we use it:</strong> Averaging the scores across all 5 distinct test runs mathematically eliminates the chance of getting a "lucky split." It guarantees that the metrics displayed above represent the model's true, unbiased ability to forecast new student performance in the real world.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. REFERENCES TAB -->
+        <section id="references" class="tab-content hidden">
+            <h2 class="text-4xl font-extrabold mb-3 text-slate-900 dark:text-white">Literature & Technical References</h2>
+            <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">Academic literature supporting regression modeling alongside the software architecture stack utilized in the Student Academic Performance Prediction build.</p>
+            
+            <div class="grid grid-cols-1 gap-6 mb-6">
+                <!-- Software Architecture Box -->
+                <div class="hover-float-spin" style="--spin-color: #38bdf8;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-8">
+                        <h4 class="text-lg font-bold text-sky-600 dark:text-sky-400 mb-4">Software Architecture & Open Source Libraries</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                            <li><strong>Python:</strong> Core backend programming language powering the machine learning data pipeline.</li>
+                            <li><strong>Scikit-Learn:</strong> Utilized for data preprocessing, regression algorithm initialization, and cross-validation metrics.</li>
+                            <li><strong>Pandas & Numpy:</strong> Employed for core dataframe manipulation and numeric array operations.</li>
+                            <li><strong>Flask:</strong> The lightweight WSGI web application framework serving the REST API.</li>
+                            <li><strong>Tailwind CSS:</strong> Front-end utility-first framework generating the responsive SPA interface.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9 Literature References Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-slate-500 dark:text-slate-400">
+                <div class="hover-float-spin" style="--spin-color: #818cf8;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
+                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[1] F. T. Johora, M. N. Hasan, A. Rajbongshi, M. Ashrafuzzaman, and F. Akter</h4>
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"An explainable AI-based approach for predicting undergraduate students academic performance," Array, vol. 26, 100384, 2025.</p>
+                    </div>
+                </div>
+                
+                <div class="hover-float-spin" style="--spin-color: #c084fc;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
+                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[2] R. Guevara-Reyes, I. Ortiz-Garcés, R. Andrade, F. Cox-Riquetti, and W. Villegas-Ch</h4>
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"Machine learning models for academic performance prediction: interpretability and application in educational decision-making," Frontiers in Education, vol. 10, 1632315, 2025.</p>
+                    </div>
+                </div>
+
+                <div class="hover-float-spin" style="--spin-color: #34d399;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
+                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[3] R. Paul, S. Sarker, H. El Aouifi, S. Hussain, A. K. Baruah, and S. Gaftandzhieva</h4>
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"Analyzing dropout of students and an explainable prediction of academic performance utilizing artificial intelligence techniques," Frontiers in Education, vol. 10, 1698505, 2025.</p>
+                    </div>
+                </div>
+
+                <div class="hover-float-spin" style="--spin-color: #fb7185;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
+                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[4] W. Gonzales, Z. Cordero, C. D. Abanto-Ramírez, E. T. Susanibar Ramírez, H. Iftikhar, and J. L. López-Gonzales</h4>
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"A hybrid AI approach for predicting academic performance in RBE students," Frontiers in Artificial Intelligence, vol. 8, 1651100, 2025.</p>
+                    </div>
+                </div>
+
+                <div class="hover-float-spin" style="--spin-color: #f59e0b;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
+                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[5] M. A. Aslam, F. Murtaza, M. E. Ul Haq, A. Yasin, and M. A. Azam</h4>
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"A Human-Centered Approach to Academic Performance Prediction Using Personality Factors in Educational AI," Information, vol. 15, no. 12, 777, 2024.</p>
+                    </div>
+                </div>
+
+                <div class="hover-float-spin" style="--spin-color: #10b981;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
+                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[6] D. N. Muhammady, H. A. E. Nugraha, V. R. S. Nastiti, and C. S. K. Aditya</h4>
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"Students Final Academic Score Prediction Using Boosting Regression Algorithms," Jurnal Ilmiah Teknik Elektro Komputer dan Informatika (JITEKI), vol. 10, no. 1, pp. 154–165, 2024.</p>
+                    </div>
+                </div>
+
+                <div class="hover-float-spin" style="--spin-color: #38bdf8;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
+                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[7] U. P. Inyang and E. A. Johnson</h4>
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"Performance Comparison of XGBoost and Random Forest for The Prediction of Students Academic Performance," European Journal of Computer Science and Information Technology, vol. 13, no. 2, pp. 1–21, 2025.</p>
+                    </div>
+                </div>
+
+                <div class="hover-float-spin" style="--spin-color: #818cf8;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
+                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[8] A. Prasanth</h4>
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"TabNet–XGBoost Hybrid Model for Student Performance Prediction and Customized Feedback," International Journal of Advanced Computer Science and Applications (IJACSA), vol. 16, no. 10, 2025.</p>
+                    </div>
+                </div>
+
+                <div class="hover-float-spin md:col-span-2" style="--spin-color: #c084fc;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
+                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[9] Y. Lu, A. S. Rajendra, J. Zhang, and T. Zhao</h4>
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"Explainable Machine Learning for Student Performance Prediction," AI in Education, vol. 2, no. 2, 17, 2026.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function toggleTheme() {
+            const html = document.getElementById('htmlRoot');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+            } else {
+                html.classList.add('dark');
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('text-sky-500', 'dark:text-sky-400', 'bg-sky-500/10');
+                el.classList.add('text-slate-600', 'dark:text-slate-300');
+            });
+            event.target.classList.remove('text-slate-600', 'dark:text-slate-300');
+            event.target.classList.add('text-sky-500', 'dark:text-sky-400', 'bg-sky-500/10');
+        }
+
+        const presets = {
+            overachiever: { Hours_Studied: 35, Attendance: 98, Previous_Scores: 95, Sleep_Hours: 8, Tutoring_Sessions: 2, Physical_Activity: 5 },
+            average: { Hours_Studied: 15, Attendance: 80, Previous_Scores: 75, Sleep_Hours: 6, Tutoring_Sessions: 0, Physical_Activity: 2 },
+            atRisk: { Hours_Studied: 4, Attendance: 60, Previous_Scores: 55, Sleep_Hours: 4, Tutoring_Sessions: 0, Physical_Activity: 0 },
+            athlete: { Hours_Studied: 20, Attendance: 90, Previous_Scores: 82, Sleep_Hours: 7, Tutoring_Sessions: 1, Physical_Activity: 12 },
+            nightOwl: { Hours_Studied: 28, Attendance: 75, Previous_Scores: 85, Sleep_Hours: 4, Tutoring_Sessions: 1, Physical_Activity: 1 }
+        };
+        function applyPreset(type) {
+            const data = presets[type];
+            for (const [k, v] of Object.entries(data)) document.getElementById(k).value = v;
+        }
+
+        const spinColors = ['#38bdf8', '#818cf8', '#c084fc', '#34d399', '#fb7185', '#f59e0b', '#10b981'];
+        const getRandomColor = () => spinColors[Math.floor(Math.random() * spinColors.length)];
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const res = await fetch('/api/dataset-inferences');
+                const data = await res.json();
+                const container = document.getElementById('inferenceContainer');
+                
+                data.forEach(item => {
+                    if(item.type !== 'text_only') {
+                        const chartLabel = item.chart_type || 'Data Visualization'; 
+                        const randColor = getRandomColor();
+                        
+                        container.innerHTML += `
+                        <div class="hover-float-spin" style="--spin-color: ${randColor};">
+                            <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6 justify-between">
+                                <div>
+                                    <span class="inline-block px-3 py-1 mb-3 text-[10px] uppercase font-bold tracking-wider bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-full">${chartLabel}</span>
+                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-3">${item.title}</h3>
+                                    <img src="${item.image}" class="rounded-xl border border-slate-200 dark:border-slate-800 mb-4 w-full object-cover">
+                                </div>
+                                <div class="bg-slate-100 dark:bg-slate-950/40 border-l-4 p-4 rounded-r-xl mt-auto" style="border-color: ${randColor};">
+                                    <span class="text-xs uppercase font-extrabold tracking-wider block mb-1" style="color: ${randColor};">Inference</span>
+                                    <p class="text-sm text-slate-700 dark:text-slate-300 m-0 leading-relaxed">${item.inference}</p>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                });
+            } catch(e) { console.error("Error loading inferences"); }
+
+            try {
+                const statsRes = await fetch('/api/model-stats-full');
+                const stats = await statsRes.json();
+
+                const commonOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { grid: { color: 'rgba(150,150,150,0.1)' }, ticks: { color: '#64748b' } },
+                        x: { grid: { display: false }, ticks: { color: '#64748b' } }
+                    },
+                    plugins: { legend: { display: false } }
+                };
+
+                new Chart(document.getElementById('chartRMSE').getContext('2d'), {
+                    type: 'bar',
+                    data: { labels: stats.labels, datasets: [{ data: stats.rmse, backgroundColor: '#38bdf8', borderRadius: 6 }] },
+                    options: commonOptions
+                });
+
+                new Chart(document.getElementById('chartR2').getContext('2d'), {
+                    type: 'bar',
+                    data: { labels: stats.labels, datasets: [{ data: stats.r2, backgroundColor: '#818cf8', borderRadius: 6 }] },
+                    options: commonOptions
+                });
+
+                new Chart(document.getElementById('chartMAE').getContext('2d'), {
+                    type: 'bar',
+                    data: { labels: stats.labels, datasets: [{ data: stats.mae, backgroundColor: '#c084fc', borderRadius: 6 }] },
+                    options: commonOptions
+                });
+
+                new Chart(document.getElementById('chartMSE').getContext('2d'), {
+                    type: 'bar',
+                    data: { labels: stats.labels, datasets: [{ data: stats.mse, backgroundColor: '#34d399', borderRadius: 6 }] },
+                    options: commonOptions
+                });
+
+                new Chart(document.getElementById('chartOverview').getContext('2d'), {
+                    type: 'line',
+                    data: { 
+                        labels: stats.labels, 
+                        datasets: [
+                            { label: 'RMSE', data: stats.rmse, borderColor: '#38bdf8', tension: 0.3 },
+                            { label: 'MAE', data: stats.mae, borderColor: '#c084fc', tension: 0.3 }
+                        ] 
+                    },
+                    options: { responsive: true, scales: { y: { grid: { color: 'rgba(150,150,150,0.1)' } } } }
+                });
+            } catch(e) { console.error("Error loading model charts"); }
+        });
+
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                Hours_Studied: document.getElementById('Hours_Studied').value,
+                Attendance: document.getElementById('Attendance').value,
+                Previous_Scores: document.getElementById('Previous_Scores').value,
+                Sleep_Hours: document.getElementById('Sleep_Hours').value,
+                Tutoring_Sessions: document.getElementById('Tutoring_Sessions').value,
+                Physical_Activity: document.getElementById('Physical_Activity').value,
+                Parental_Involvement: "Medium", Access_to_Resources: "Medium", Motivation_Level: "Medium",
+                Family_Income: "Medium", Teacher_Quality: "Medium", Peer_Influence: "Neutral",
+                School_Type: "Public", Internet_Access: "Yes", Extracurricular_Activities: "Yes",
+                Learning_Disabilities: "No", Parental_Education_Level: "High School", Distance_from_Home: "Near", Gender: "Male"
+            };
+
+            const res = await fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const json = await res.json();
+
+            document.getElementById('resScore').textContent = json.score;
+            const badge = document.getElementById('resRisk');
+            badge.textContent = json.risk;
+            badge.className = `inline-block px-4 py-1.5 rounded-full text-sm font-bold mb-6 ${json.risk === 'High Risk' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20' : json.risk === 'Moderate Risk' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'}`;
+
+            let recHtml = '';
+            json.recommendations.forEach(r => {
+                recHtml += `<li class="p-4 bg-sky-500/10 border-l-4 border-sky-500 rounded-r-xl shadow-sm text-sky-800 dark:text-sky-200 font-medium">${r}</li>`;
+            });
+            document.getElementById('resRecs').innerHTML = recHtml;
+
+            let shapHtml = '';
+            json.features.forEach(f => {
+                const color = f.contribution > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400';
+                shapHtml += `<div class="p-3 bg-slate-100 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800">Feature <strong class="text-slate-900 dark:text-slate-100">${f.name}</strong> (val: ${f.value}) <span class="${color} font-bold">${f.contribution > 0 ? 'increased' : 'decreased'}</span> final score expectation by <span class="${color} font-bold">${Math.abs(f.contribution)} points</span>.</div>`;
+            });
+            document.getElementById('resShap').innerHTML = shapHtml;
+        });
+    </script>
+</body>
+</html>

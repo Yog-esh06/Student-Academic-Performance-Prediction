@@ -1,0 +1,38 @@
+[
+    {
+        "type": "image",
+        "title": "1. Target Score Distribution",
+        "image": "/static/images/eda/graph1.png",
+        "inference": "The exam score clusters around a mean of 67.2. Normal dispersion ensures balanced gradient updates during regression training."
+    },
+    {
+        "type": "image",
+        "title": "2. Feature Correlation Matrix",
+        "image": "/static/images/eda/graph2.png",
+        "inference": "Highlights multicollinearity across features. Attendance and Hours Studied display the highest positive alignment with target exam outcomes."
+    },
+    {
+        "type": "image",
+        "title": "3. Study Hours vs Exam Score",
+        "image": "/static/images/eda/graph3.png",
+        "inference": "Demonstrates a clear positive linear trend. Students committing higher weekly hours reliably score higher on final evaluations."
+    },
+    {
+        "type": "image",
+        "title": "4. Parental Involvement Impact",
+        "image": "/static/images/eda/graph4.png",
+        "inference": "Medium to High parental involvement categories consistently elevate median exam bounds, highlighting the importance of external support systems."
+    },
+    {
+        "type": "image",
+        "title": "5. Rest & Sleep Distribution",
+        "image": "/static/images/eda/graph5.png",
+        "inference": "Most students report standard rest schedules. Outliers with extreme sleep deficits show a direct drop in predicted performance metrics."
+    },
+    {
+        "type": "image",
+        "title": "6. Historical Baseline Correlation",
+        "image": "/static/images/eda/graph6.png",
+        "inference": "Historical scores serve as a robust predictor for current evaluation outcomes, establishing strong continuity in student learning capabilities."
+    }
+]
