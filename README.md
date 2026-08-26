@@ -3,7 +3,6 @@
 
 An advanced, research-backed machine learning decision-support framework designed to forecast continuous student examination scores, detect performance risk tiers, and decode model predictions using SHAP (SHapley Additive exPlanations). 
 
-This project was developed as an institutional research project for the domain of **Educational Data Mining & XAI**.
 
 ---
 
