@@ -61,7 +61,7 @@ Student-Academic-Performance-Prediction/
 
 1. **Clone the Repository:**
 ```bash
-git clone [https://github.com/Yog-esh06/Student-Academic-Performance-Prediction.git](https://github.com/Yog-esh06/Student-Academic-Performance-Prediction.git)
+git clone https://github.com/Yog-esh06/Student-Academic-Performance-Prediction.git
 cd Student-Academic-Performance-Prediction
 
 ```
