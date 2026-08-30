@@ -105,3 +105,11 @@ Based on our 5-Fold Cross-Validation:
 
 *A full list of the 9 academic research papers supporting this architecture can be found in the **References** tab of the application.*
 
+## 👤 Author
+
+Yogesh R Mehta
+
+## 📄 License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+
