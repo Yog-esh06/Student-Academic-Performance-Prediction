@@ -1,6 +1,7 @@
 """End-to-end orchestration script."""
 import subprocess
 import sys
+from src.risk.risk_classifier import CostSensitiveRiskModel
 
 def run_module(module_name: str):
     """Runs a Python module as a subprocess."""
@@ -17,7 +18,7 @@ def run_module(module_name: str):
 if __name__ == "__main__":
     print("Starting Student Performance Prediction Pipeline...")
     
-    # Run the pipeline stages in order
+    # Run the standard pipeline stages in order
     modules = [
         "src.data.load_data",
         "src.data.preprocess",
@@ -28,6 +29,11 @@ if __name__ == "__main__":
     
     for mod in modules:
         run_module(mod)
+        
+    # Train the new Risk Classifier
+    print("\n--- Initializing Temporal & Cost-Sensitive Risk Engine ---")
+    risk_engine = CostSensitiveRiskModel()
+    risk_engine.train()
         
     print("\n✅ Pipeline completed successfully!")
     print("\nTo launch the dashboard, run:")

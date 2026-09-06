@@ -19,11 +19,12 @@ An advanced, research-backed machine learning decision-support framework designe
 ---
 
 ## ✨ Key Features
-* **Predictive Regression Pipeline:** Trains and compares 5 machine learning models (Linear Regression, Gradient Boosting, XGBoost, Random Forest, and Decision Tree).
-* **Robust Validation:** Implements **5-Fold Cross-Validation** to ensure unbiased model evaluation and eliminate overfitting.
+* **Cost-Sensitive Risk Classification:** Implements an asymmetric cost matrix in XGBoost to strictly penalize False Negatives, minimizing false alarms and prioritizing the identification of failing students.
+* **Temporal Feature Engineering:** Transforms static dataset snapshots into simulated time-series phases (Early Engagement, Midterm Consistency, Late Term Fatigue) to track student progression.
+* **Class Imbalance Resolution (SMOTE):** Utilizes Synthetic Minority Over-sampling Technique to balance the naturally skewed "At-Risk" educational datasets during model training.
+* **Prediction Uncertainty Quantification:** Calculates Shannon Entropy on output probabilities. If entropy exceeds 0.85, the system flags the prediction for mandatory human educator review rather than automating a risky intervention.
+* **Predictive Regression Pipeline:** Trains and compares 5 continuous machine learning models evaluated via 5-Fold Cross-Validation.
 * **Explainable AI (XAI):** Utilizes SHAP interpretability to translate complex mathematical model decisions into clear, human-readable feature impacts.
-* **Automated Risk & Intervention System:** Converts continuous exam score outputs into actionable early-warning risk categories and generates custom improvement plans.
-* **Interactive SPA Dashboard:** A sleek, dual-mode (Light/Dark) Tailwind CSS web interface featuring custom CSS conic-gradient floating animations, real-time inferencing, and dynamic EDA visual tagging.
 
 ---
 

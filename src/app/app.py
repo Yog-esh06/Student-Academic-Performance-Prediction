@@ -5,12 +5,15 @@ import joblib
 from flask import Flask, request, render_template, jsonify, send_from_directory
 
 from src import config
-from src.risk.risk_classifier import classify_risk
+from src.risk.risk_classifier import CostSensitiveRiskModel
 from src.explainability.shap_explain import get_shap_explainer, explain_single_prediction
 from src.recommendations.recommend import generate_recommendations
 from src.data.eda_generator import generate_full_eda
 
 app = Flask(__name__)
+
+# Initialize the Temporal & Cost-Sensitive Risk Engine
+risk_engine = CostSensitiveRiskModel()
 
 # Auto-generate EDA files on startup if they don't exist
 json_check = config.BASE_DIR / "src" / "app" / "static" / "inferences.json"
@@ -76,11 +79,45 @@ def predict():
     input_df = pd.DataFrame([form_data])
     input_transformed = preprocessor.transform(input_df)
     
+    # 1. Base Score Prediction
     predicted_score = round(best_model.predict(input_transformed)[0], 1)
-    risk_category = classify_risk(predicted_score)
+    
+    # 2. Inject Defaults for Missing Features
+    default_features = {
+        "Motivation_Level": "Medium", "Access_to_Resources": "Medium",
+        "Family_Income": "Medium", "Teacher_Quality": "Medium",
+        "Peer_Influence": "Neutral", "School_Type": "Public",
+        "Internet_Access": "Yes", "Extracurricular_Activities": "No",
+        "Learning_Disabilities": "No", "Parental_Education_Level": "High School",
+        "Distance_from_Home": "Near", "Gender": "Male",
+        "Parental_Involvement": "Medium"
+    }
+    risk_input_data = {**default_features, **form_data}
+    
+    # 3. Cost-Sensitive Risk & Uncertainty Inference
+    try:
+        risk_results = risk_engine.predict_risk(risk_input_data)
+        risk_category = risk_results['status']
+    except Exception as e:
+        print(f"Risk Engine Error: {e}")
+        risk_category = "Unknown"
+        risk_results = {"is_uncertain": False, "risk_flag": False, "uncertainty_score": 0.0}
+
+    # 4. Base SHAP Explanations
     top_features = explain_single_prediction(explainer, input_transformed, feature_names)
     recommendations = generate_recommendations(top_features, risk_category)
     
+    # 5. Recommendations Injection
+    if risk_results.get("is_uncertain"):
+        recommendations.insert(0, "⚠️ MODEL UNCERTAINTY HIGH: The student's profile shows conflicting temporal signals. A human educator must manually review this case.")
+    elif risk_results.get("risk_flag"):
+        recommendations.insert(0, "🚨 HIGH RISK DETECTED: Cost-sensitive analysis flags this student for immediate early intervention.")
+        if form_data.get('Attendance', 100) < 75:
+            recommendations.insert(1, "Action: Phase 1 Engagement is critically low. Prioritize attendance recovery.")
+    else:
+        recommendations.insert(0, "✅ On Track: Student demonstrates stable progression across temporal phases.")
+
+    # Format SHAP Features
     clean_features = []
     for f in top_features:
         clean_name = f['feature'].replace('num__', '').replace('cat__', '').replace('_', ' ')
@@ -89,11 +126,21 @@ def predict():
             "value": round(f['value'], 2),
             "contribution": round(f['shap_contribution'], 2)
         })
+        
+    # Format Temporal & Uncertainty Features for the New Dedicated Box
+    temp_df = risk_engine._engineer_temporal_features(pd.DataFrame([risk_input_data]))
+    risk_features = [
+        {"name": "Phase 1 Early Engagement", "value": round(float(temp_df['Phase1_Engagement'].iloc[0]), 2), "desc": "Evaluates attendance weighted by motivation trajectory."},
+        {"name": "Phase 2 Midterm Consistency", "value": round(float(temp_df['Phase2_Consistency'].iloc[0]), 2), "desc": "Combines previous scores and tutoring progression."},
+        {"name": "Phase 3 Late Term Fatigue", "value": round(float(temp_df['Phase3_Fatigue'].iloc[0]), 2), "desc": "Measures study-to-sleep ratios and physical activity balance."},
+        {"name": "Prediction Uncertainty (Entropy)", "value": risk_results.get("uncertainty_score", 0.0), "desc": "Shannon Entropy measuring model confidence spread."}
+    ]
     
     return jsonify({
         "score": predicted_score,
         "risk": risk_category,
         "features": clean_features,
+        "risk_features": risk_features,
         "recommendations": recommendations
     })
 

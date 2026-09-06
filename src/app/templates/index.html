@@ -148,7 +148,7 @@
                                 <li class="flex flex-col"><a href="https://www.linkedin.com/in/yog-esh06/" target="_blank" class="text-slate-900 dark:text-white hover:text-emerald-500 dark:hover:text-emerald-400 hover:underline transition-colors">Yogesh R Mehta</a> <span class="text-xs font-normal text-slate-500 dark:text-slate-400">RA2411003010776</span></li>
                                 <li class="flex flex-col"><a href="https://www.linkedin.com/in/bhavym/" target="_blank" class="text-slate-900 dark:text-white hover:text-emerald-500 dark:hover:text-emerald-400 hover:underline transition-colors">Bhavy Manchanda</a> <span class="text-xs font-normal text-slate-500 dark:text-slate-400">RA2411003010749</span></li>
                                 <li class="flex flex-col"><a href="https://www.linkedin.com/in/darsh-saraf-540b19323/" target="_blank" class="text-slate-900 dark:text-white hover:text-emerald-500 dark:hover:text-emerald-400 hover:underline transition-colors">Darsh M Saraf</a> <span class="text-xs font-normal text-slate-500 dark:text-slate-400">RA2411003010731</span></li>
-                                <li class="flex flex-col">Bhavish <span class="text-xs font-normal text-slate-500 dark:text-slate-400">RA2411003010765</span></li>
+                                <li class="flex flex-col"><a href="https://www.linkedin.com/in/bhavish-akula-4081393b6" target="_blank" class="text-slate-900 dark:text-white hover:text-emerald-500 dark:hover:text-emerald-400 hover:underline transition-colors">Bhavish Akula</a> <span class="text-xs font-normal text-slate-500 dark:text-slate-400">RA2411003010765</span></li>
                             </ul>
                         </div>
                     </div>
@@ -234,11 +234,22 @@
             </div>
 
             <!-- Bottom Box: SHAP Explanations -->
-            <div class="hover-float-spin" style="--spin-color: #10b981;">
+            <div class="hover-float-spin mb-8" style="--spin-color: #10b981;">
                 <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-8">
                     <h4 class="text-xl font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-800 pb-2 mb-6">Backed by SHAP Values (Feature Impact Justification)</h4>
                     <div id="resShap" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-slate-600 dark:text-slate-300">
                         <span class="text-slate-400 dark:text-slate-500 italic">Awaiting prediction to decode mathematical feature justifications...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Block Under SHAP Analysis for Temporal & Uncertainty Metrics -->
+            <div class="hover-float-spin" style="--spin-color: #6366f1;">
+                <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-8">
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200 dark:border-slate-800 pb-2 mb-2">Temporal Progression & Prediction Uncertainty (Risk Engine)</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-6">Deconstructs student risk across simulated temporal phases alongside Shannon Entropy confidence bounds.</p>
+                    <div id="risk-features-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <p class="text-slate-400 dark:text-slate-500 text-sm italic">Execute a student prediction above to evaluate temporal phases and uncertainty metrics.</p>
                     </div>
                 </div>
             </div>
@@ -416,9 +427,12 @@
                 
                 <div class="hover-float-spin" style="--spin-color: #f59e0b;">
                     <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-8">
-                        <h3 class="text-xl font-bold text-amber-500 dark:text-amber-400 mb-4">Understanding 5-Fold Cross-Validation</h3>
+                        <h3 class="text-xl font-bold text-amber-500 dark:text-amber-400 mb-4">Understanding 5-Fold Cross-Validation Error Metrics</h3>
                         <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
                             <strong>What it is:</strong> Instead of relying on a single test score, the dataset is divided into 5 equal chunks (folds). The model trains on 4 chunks and tests its predictions on the 1 remaining chunk. This entire process repeats 5 times so that every chunk acts as a test set exactly once.
+                        </p>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                            <strong>What the values mean:</strong> Linear Regression achieves the lowest average MAE (~0.45 exam points error) and RMSE (~2.09), proving it has the highest stability and lowest variance across unseen student subsets compared to high-variance tree models.
                         </p>
                         <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed m-0">
                             <strong>Why we use it:</strong> Averaging the scores across all 5 distinct test runs mathematically eliminates the chance of getting a "lucky split." It guarantees that the metrics displayed above represent the model's true, unbiased ability to forecast new student performance in the real world.
@@ -441,6 +455,7 @@
                         <ul class="list-disc pl-5 space-y-2 text-sm text-slate-600 dark:text-slate-300">
                             <li><strong>Python:</strong> Core backend programming language powering the machine learning data pipeline.</li>
                             <li><strong>Scikit-Learn:</strong> Utilized for data preprocessing, regression algorithm initialization, and cross-validation metrics.</li>
+                            <li><strong>XGBoost & Imbalanced-Learn (SMOTE):</strong> Powers the cost-sensitive risk classification engine and minority class balancing.</li>
                             <li><strong>Pandas & Numpy:</strong> Employed for core dataframe manipulation and numeric array operations.</li>
                             <li><strong>Flask:</strong> The lightweight WSGI web application framework serving the REST API.</li>
                             <li><strong>Tailwind CSS:</strong> Front-end utility-first framework generating the responsive SPA interface.</li>
@@ -449,70 +464,119 @@
                 </div>
             </div>
 
-            <!-- 9 Literature References Grid -->
+            <!-- 10 Literature References Grid with Clickable Hover Titles & Spinning Borders -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-slate-500 dark:text-slate-400">
-                <div class="hover-float-spin" style="--spin-color: #818cf8;">
-                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
-                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[1] F. T. Johora, M. N. Hasan, A. Rajbongshi, M. Ashrafuzzaman, and F. Akter</h4>
-                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"An explainable AI-based approach for predicting undergraduate students academic performance," Array, vol. 26, 100384, 2025.</p>
+                
+                <div class="hover-float-spin" style="--spin-color: #38bdf8;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6 h-full flex flex-col justify-between">
+                        <h4 class="text-base font-bold mb-2">
+                            <a href="https://doi.org/10.1016/j.caeai.2024.100254" target="_blank" class="text-slate-900 dark:text-white hover:text-sky-500 dark:hover:text-sky-400 hover:underline transition-colors">
+                                [1] XGBoost To Enhance Learner Performance Prediction — S. Hakkal, A. Ait Lahcen (2024)
+                            </a>
+                        </h4>
+                        <p class="text-xs text-slate-400 mt-2">Click title to access external publication.</p>
                     </div>
                 </div>
-                
+
+                <div class="hover-float-spin" style="--spin-color: #818cf8;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6 h-full flex flex-col justify-between">
+                        <h4 class="text-base font-bold mb-2">
+                            <a href="https://doi.org/10.1155/2024/4067721" target="_blank" class="text-slate-900 dark:text-white hover:text-indigo-500 dark:hover:text-indigo-400 hover:underline transition-colors">
+                                [2] Student Performance Prediction Using Machine Learning Algorithms — Esmael Ahmed (2024)
+                            </a>
+                        </h4>
+                        <p class="text-xs text-slate-400 mt-2">Click title to access external publication.</p>
+                    </div>
+                </div>
+
                 <div class="hover-float-spin" style="--spin-color: #c084fc;">
-                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
-                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[2] R. Guevara-Reyes, I. Ortiz-Garcés, R. Andrade, F. Cox-Riquetti, and W. Villegas-Ch</h4>
-                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"Machine learning models for academic performance prediction: interpretability and application in educational decision-making," Frontiers in Education, vol. 10, 1632315, 2025.</p>
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6 h-full flex flex-col justify-between">
+                        <h4 class="text-base font-bold mb-2">
+                            <a href="https://doi.org/10.1016/j.heliyon.2024.e32570" target="_blank" class="text-slate-900 dark:text-white hover:text-purple-500 dark:hover:text-purple-400 hover:underline transition-colors">
+                                [3] Predicting Performance of Students by Optimizing Tree Components of Random Forest Using Genetic Algorithm — M. Chen, Z. Liu (2024)
+                            </a>
+                        </h4>
+                        <p class="text-xs text-slate-400 mt-2">Click title to access external publication.</p>
                     </div>
                 </div>
 
                 <div class="hover-float-spin" style="--spin-color: #34d399;">
-                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
-                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[3] R. Paul, S. Sarker, H. El Aouifi, S. Hussain, A. K. Baruah, and S. Gaftandzhieva</h4>
-                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"Analyzing dropout of students and an explainable prediction of academic performance utilizing artificial intelligence techniques," Frontiers in Education, vol. 10, 1698505, 2025.</p>
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6 h-full flex flex-col justify-between">
+                        <h4 class="text-base font-bold mb-2">
+                            <a href="https://doi.org/10.1371/journal.pone.0309838" target="_blank" class="text-slate-900 dark:text-white hover:text-emerald-500 dark:hover:text-emerald-400 hover:underline transition-colors">
+                                [4] Academic Achievement Prediction in Higher Education Through Interpretable Modeling — S. Wang, B. Luo (2024)
+                            </a>
+                        </h4>
+                        <p class="text-xs text-slate-400 mt-2">Click title to access external publication.</p>
                     </div>
                 </div>
 
                 <div class="hover-float-spin" style="--spin-color: #fb7185;">
-                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
-                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[4] W. Gonzales, Z. Cordero, C. D. Abanto-Ramírez, E. T. Susanibar Ramírez, H. Iftikhar, and J. L. López-Gonzales</h4>
-                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"A hybrid AI approach for predicting academic performance in RBE students," Frontiers in Artificial Intelligence, vol. 8, 1651100, 2025.</p>
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6 h-full flex flex-col justify-between">
+                        <h4 class="text-base font-bold mb-2">
+                            <a href="https://doi.org/10.1111/hequ.12539" target="_blank" class="text-slate-900 dark:text-white hover:text-rose-500 dark:hover:text-rose-400 hover:underline transition-colors">
+                                [5] Development of an Early Warning System for Higher Education Institutions by Predicting First-Year Student Academic Performance — C. R. Çırak, H. Akıllı, Y. Ekinci (2024)
+                            </a>
+                        </h4>
+                        <p class="text-xs text-slate-400 mt-2">Click title to access external publication.</p>
                     </div>
                 </div>
 
                 <div class="hover-float-spin" style="--spin-color: #f59e0b;">
-                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
-                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[5] M. A. Aslam, F. Murtaza, M. E. Ul Haq, A. Yasin, and M. A. Azam</h4>
-                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"A Human-Centered Approach to Academic Performance Prediction Using Personality Factors in Educational AI," Information, vol. 15, no. 12, 777, 2024.</p>
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6 h-full flex flex-col justify-between">
+                        <h4 class="text-base font-bold mb-2">
+                            <a href="https://doi.org/10.1371/journal.pone.0299018" target="_blank" class="text-slate-900 dark:text-white hover:text-amber-500 dark:hover:text-amber-400 hover:underline transition-colors">
+                                [6] Machine Learning Approach to Student Performance Prediction of Online Learning — Jing Wang, Yun Yu (2025)
+                            </a>
+                        </h4>
+                        <p class="text-xs text-slate-400 mt-2">Click title to access external publication.</p>
                     </div>
                 </div>
 
                 <div class="hover-float-spin" style="--spin-color: #10b981;">
-                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
-                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[6] D. N. Muhammady, H. A. E. Nugraha, V. R. S. Nastiti, and C. S. K. Aditya</h4>
-                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"Students Final Academic Score Prediction Using Boosting Regression Algorithms," Jurnal Ilmiah Teknik Elektro Komputer dan Informatika (JITEKI), vol. 10, no. 1, pp. 154–165, 2024.</p>
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6 h-full flex flex-col justify-between">
+                        <h4 class="text-base font-bold mb-2">
+                            <a href="https://doi.org/10.1371/journal.pone.0323345" target="_blank" class="text-slate-900 dark:text-white hover:text-emerald-500 dark:hover:text-emerald-400 hover:underline transition-colors">
+                                [7] What Factors Enhance Students' Achievement? A Machine Learning and Interpretable Methods Approach — Hui Mao et al. (2025)
+                            </a>
+                        </h4>
+                        <p class="text-xs text-slate-400 mt-2">Click title to access external publication.</p>
                     </div>
                 </div>
 
                 <div class="hover-float-spin" style="--spin-color: #38bdf8;">
-                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
-                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[7] U. P. Inyang and E. A. Johnson</h4>
-                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"Performance Comparison of XGBoost and Random Forest for The Prediction of Students Academic Performance," European Journal of Computer Science and Information Technology, vol. 13, no. 2, pp. 1–21, 2025.</p>
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6 h-full flex flex-col justify-between">
+                        <h4 class="text-base font-bold mb-2">
+                            <a href="https://doi.org/10.1371/journal.pone.0314823" target="_blank" class="text-slate-900 dark:text-white hover:text-sky-500 dark:hover:text-sky-400 hover:underline transition-colors">
+                                [8] Optimizing Multi Label Student Performance Prediction with GNN-TINet — Xiaoyi Zhang et al. (2025)
+                            </a>
+                        </h4>
+                        <p class="text-xs text-slate-400 mt-2">Click title to access external publication.</p>
                     </div>
                 </div>
 
                 <div class="hover-float-spin" style="--spin-color: #818cf8;">
-                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
-                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[8] A. Prasanth</h4>
-                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"TabNet–XGBoost Hybrid Model for Student Performance Prediction and Customized Feedback," International Journal of Advanced Computer Science and Applications (IJACSA), vol. 16, no. 10, 2025.</p>
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6 h-full flex flex-col justify-between">
+                        <h4 class="text-base font-bold mb-2">
+                            <a href="https://researchportal.hw.ac.uk/en/publications/data-driven-decisions-in-education-using-a-comprehensive-machine-" target="_blank" class="text-slate-900 dark:text-white hover:text-indigo-500 dark:hover:text-indigo-400 hover:underline transition-colors">
+                                [9] Data Driven Decisions in Education Using a Comprehensive Machine Learning Framework — Muhammad Nadeem Gul et al. (2025)
+                            </a>
+                        </h4>
+                        <p class="text-xs text-slate-400 mt-2">Click title to access external publication.</p>
                     </div>
                 </div>
 
-                <div class="hover-float-spin md:col-span-2" style="--spin-color: #c084fc;">
-                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6">
-                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">[9] Y. Lu, A. S. Rajendra, J. Zhang, and T. Zhao</h4>
-                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">"Explainable Machine Learning for Student Performance Prediction," AI in Education, vol. 2, no. 2, 17, 2026.</p>
+                <div class="hover-float-spin" style="--spin-color: #c084fc;">
+                    <div class="hover-float-spin-inner bg-white dark:bg-cardbg border border-slate-200 dark:border-slate-800 p-6 h-full flex flex-col justify-between">
+                        <h4 class="text-base font-bold mb-2">
+                            <a href="https://doi.org/10.18280/isi.310420" target="_blank" class="text-slate-900 dark:text-white hover:text-purple-500 dark:hover:text-purple-400 hover:underline transition-colors">
+                                [10] An Explainable Stacking Ensemble Framework for Student Academic Performance Prediction — Eni Heni Hermaliani et al. (2026)
+                            </a>
+                        </h4>
+                        <p class="text-xs text-slate-400 mt-2">Click title to access external publication.</p>
                     </div>
                 </div>
+
             </div>
         </section>
 
@@ -661,7 +725,7 @@
             document.getElementById('resScore').textContent = json.score;
             const badge = document.getElementById('resRisk');
             badge.textContent = json.risk;
-            badge.className = `inline-block px-4 py-1.5 rounded-full text-sm font-bold mb-6 ${json.risk === 'High Risk' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20' : json.risk === 'Moderate Risk' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'}`;
+            badge.className = `inline-block px-4 py-1.5 rounded-full text-sm font-bold mb-6 ${json.risk.includes('High Risk') ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20' : json.risk.includes('Moderate') || json.risk.includes('Review') ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'}`;
 
             let recHtml = '';
             json.recommendations.forEach(r => {
@@ -675,6 +739,20 @@
                 shapHtml += `<div class="p-3 bg-slate-100 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800">Feature <strong class="text-slate-900 dark:text-slate-100">${f.name}</strong> (val: ${f.value}) <span class="${color} font-bold">${f.contribution > 0 ? 'increased' : 'decreased'}</span> final score expectation by <span class="${color} font-bold">${Math.abs(f.contribution)} points</span>.</div>`;
             });
             document.getElementById('resShap').innerHTML = shapHtml;
+
+            let riskHtml = '';
+            if(json.risk_features) {
+                json.risk_features.forEach(rf => {
+                    riskHtml += `
+                        <div class="bg-slate-100 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                            <span class="text-xs font-bold uppercase text-indigo-500 dark:text-indigo-400 block mb-1">${rf.name}</span>
+                            <div class="text-lg font-black text-slate-900 dark:text-white">Value: ${rf.value}</div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${rf.desc}</p>
+                        </div>
+                    `;
+                });
+                document.getElementById('risk-features-container').innerHTML = riskHtml;
+            }
         });
     </script>
 </body>
